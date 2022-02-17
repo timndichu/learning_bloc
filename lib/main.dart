@@ -1,10 +1,13 @@
 // ignore_for_file: avoid_print, prefer_const_constructors, deprecated_member_use
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learning_bloc/cubit/counter_cubit.dart';
+import 'package:learning_bloc/cubit/settings_cubit.dart';
 
+import 'cubit/internet_cubit.dart';
 import 'presentation/router/app_router.dart';
 
 void main() {
@@ -13,24 +16,35 @@ void main() {
   final CounterState counterState2 = CounterState(
       counterValue: 1, wasIncremented: false, wasDecremented: false);
   print(counterState1 == counterState2);
-  runApp(MyApp());
+  runApp(MyApp(
+    appRouter: AppRouter(),
+    connectivity: Connectivity(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key, required this.appRouter, required this.connectivity})
+      : super(key: key);
 
-  final AppRouter _appRouter = AppRouter();
+  final AppRouter appRouter;
+  final Connectivity connectivity;
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<CounterCubit>(
-      create: (context) => CounterCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CounterCubit>(create: (context) => CounterCubit()),
+        BlocProvider<SettingsCubit>(create: (context) => SettingsCubit()),
+        BlocProvider<InternetCubit>(
+          create: (context) => InternetCubit(connectivity: connectivity),
+        ),
+      ],
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        onGenerateRoute: _appRouter.onGenerateRoute,
+        onGenerateRoute: appRouter.onGenerateRoute,
       ),
     );
   }
