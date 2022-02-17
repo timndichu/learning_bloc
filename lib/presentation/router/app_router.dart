@@ -7,7 +7,6 @@ import 'package:learning_bloc/presentation/screens/third_screen.dart';
 
 class AppRouter {
   Route? onGenerateRoute(RouteSettings settings) {
-    final Object? key = settings.arguments;
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
@@ -27,8 +26,8 @@ class AppRouter {
       case '/third':
         return MaterialPageRoute(
           builder: (_) => ThirdScreen(
-            title: "Thirst Screen",
-            color: Colors.greenAccent,
+            title: "Third Screen",
+            color: Colors.green,
           ),
         );
       default:
