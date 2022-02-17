@@ -1,41 +1,15 @@
-import 'dart:async';
+import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:learning_bloc/constants/enums.dart';
-import 'package:learning_bloc/cubit/internet_cubit.dart';
-import 'package:meta/meta.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'counter_state.dart';
 
-class CounterCubit extends Cubit<CounterState> {
-  //We want to check the internet status and perform operations when there is internet connection
-
-  // final InternetCubit internetCubit;
-  // late StreamSubscription internetStreamSubscription;
-
-  // CounterCubit({required this.internetCubit})
-  //     : super(CounterState(
-  //           counterValue: 0, wasDecremented: false, wasIncremented: false)) {
-  //   monitorInternetCubit();
-  // }
-
+class CounterCubit extends Cubit<CounterState> with HydratedMixin {
   CounterCubit()
       : super(CounterState(
             counterValue: 0, wasDecremented: false, wasIncremented: false));
-
-  // StreamSubscription<InternetState> monitorInternetCubit() {
-  //   return internetStreamSubscription =
-  //       internetCubit.stream.listen((internetState) {
-  //     if (internetState is InternetConnected &&
-  //         internetState.connectionType == ConnectionType.Wifi) {
-  //       increment();
-  //     } else if (internetState is InternetConnected &&
-  //         internetState.connectionType == ConnectionType.Mobile) {
-  //       decrement();
-  //     }
-  //   });
-  // }
 
   void increment() => emit(CounterState(
       counterValue: state.counterValue + 1,
@@ -47,9 +21,21 @@ class CounterCubit extends Cubit<CounterState> {
       wasDecremented: true,
       wasIncremented: false));
 
-  // @override
-  // Future<void> close() {
-  //   internetStreamSubscription.cancel();
-  //   return super.close();
-  // }
+  //called everytime the app needs data
+  @override
+  CounterState? fromJson(Map<String, dynamic> json) {
+    //every time we want our data, hydrated bloc will call fromJson
+    //This will retrieve our JSON which is already converted to a map
+
+    //We will need to return a new instance of the counterState populated with the data from that map
+    return CounterState.fromMap(json);
+  }
+
+  //called for every state
+  @override
+  Map<String, dynamic>? toJson(CounterState state) {
+    //every time we have a state change, we want to save it to a map
+    //Then send it to our hydratedbloc to store it to our local storage
+    return state.toMap();
+  }
 }
